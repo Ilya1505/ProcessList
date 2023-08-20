@@ -9,21 +9,25 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using NLog;
 
 namespace ProcessList
 {
     public partial class ProccessInfoForm : Form
     {
+        private static Logger logger;
         private Process process;
         private double coefMb;
         public ProccessInfoForm(Process process)
         {
+            logger = LogManager.GetCurrentClassLogger();
             InitializeComponent();
             Setup(process);
 
         }
         public void Setup(Process process)
         {
+            logger.Info("Инициализация формы ProcessInfoForm");
             this.process = process;
             coefMb = 1048576;
             gridProcess.AutoResizeRows();
@@ -44,7 +48,6 @@ namespace ProcessList
             }
             catch { gridProcess.Rows.Add("Время работы", "Отказано в доступе"); }
             gridProcess.Rows.Add("Число потоков", process.Threads.Count.ToString());
-
         }
 
         private void killButton_Click(object sender, EventArgs e)
@@ -53,16 +56,19 @@ namespace ProcessList
             {
                 process.Kill();
                 MessageBox.Show("Процесс успешно завершен", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                logger.Info("Процесс {0}: {1} успешно завершен", process.Id, process.ProcessName);
                 this.Close();
             }
             catch 
             {
+                logger.Error("Не удалось завершить процесс {0}: {1}, отказано в доступе ", process.Id, process.ProcessName);
                 MessageBox.Show("Не удалось выполнить операцию", "Отказано в доступе", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            logger.Info("Закрытие формы ProcessInfoForm");
             this.Close();
         }
     }

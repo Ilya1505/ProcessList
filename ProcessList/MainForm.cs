@@ -8,17 +8,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using NLog;
+using NLog.Fluent;
 
 namespace ProcessList
 {
     public partial class MainForm : Form
     {
-        Process[] localAll;
+        private static Logger logger;
+        private Process[] localAll;
         private string labelCountProcText;
         private string labelCommonMemoryText;
         private double coefMb;
         public MainForm()
         {
+            logger = LogManager.GetCurrentClassLogger();
             InitializeComponent();
             setup();
             UpdateProcess();
@@ -26,6 +30,7 @@ namespace ProcessList
 
         public void setup()
         {
+            logger.Info("Инициализация системы");
             coefMb = 1048576;
             gridProcessList.AutoResizeRows();
             gridProcessList.AllowUserToAddRows = false;
@@ -58,21 +63,13 @@ namespace ProcessList
 
         private void gridProcess_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            logger.Info("Выделение строки пользователем");
             gridProcessList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-
-            //try
-            //{
-            //    ProccessInfoForm processInfoForm = new ProccessInfoForm(localAll[e.RowIndex]);
-            //    processInfoForm.ShowDialog();
-            //}
-            //catch(Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //}
         }
 
         private void gridProcessList_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            logger.Info("Открытие формы ProcessInfoForm по двойному клику");
             try
             {
                 ProccessInfoForm processInfoForm = new ProccessInfoForm(localAll[e.RowIndex]);
@@ -80,6 +77,7 @@ namespace ProcessList
             }
             catch (Exception ex)
             {
+                logger.Error("Ошибка открытия формы ProcessInfoForm");
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -88,6 +86,7 @@ namespace ProcessList
         {
             if (e.KeyValue == 13 && gridProcessList.CurrentRow!=null)
             {
+                logger.Info("Открытие формы ProcessInfoForm по нажатию Enter при выделенной строке");
                 try
                 {
                     ProccessInfoForm processInfoForm = new ProccessInfoForm(localAll[gridProcessList.CurrentRow.Index]);
@@ -95,6 +94,7 @@ namespace ProcessList
                 }
                 catch (Exception ex)
                 {
+                    logger.Error("Ошибка открытия формы ProcessInfoForm");
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
