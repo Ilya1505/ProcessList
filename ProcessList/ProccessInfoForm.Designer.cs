@@ -35,7 +35,7 @@
             this.key = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.value = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.killButton = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.ExitButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.gridProcess)).BeginInit();
             this.SuspendLayout();
             // 
@@ -92,18 +92,18 @@
             this.killButton.UseVisualStyleBackColor = true;
             this.killButton.Click += new System.EventHandler(this.killButton_Click);
             // 
-            // button1
+            // ExitButton
             // 
-            resources.ApplyResources(this.button1, "button1");
-            this.button1.Name = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            resources.ApplyResources(this.ExitButton, "ExitButton");
+            this.ExitButton.Name = "ExitButton";
+            this.ExitButton.UseVisualStyleBackColor = true;
+            this.ExitButton.Click += new System.EventHandler(this.ExitButton_Click);
             // 
             // ProccessInfoForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.ExitButton);
             this.Controls.Add(this.killButton);
             this.Controls.Add(this.gridProcess);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -111,6 +111,7 @@
             this.Name = "ProccessInfoForm";
             ((System.ComponentModel.ISupportInitialize)(this.gridProcess)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -120,6 +121,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn key;
         private System.Windows.Forms.DataGridViewTextBoxColumn value;
         private System.Windows.Forms.Button killButton;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button ExitButton;
     }
 }

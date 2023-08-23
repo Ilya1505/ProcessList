@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 using NLog;
 using NLog.Fluent;
 using NLog.LayoutRenderers;
@@ -17,7 +18,9 @@ namespace ProcessList
     public partial class MainForm : Form
     {
         private static Logger logger;
-        private Process[] localAll;
+        private Process[] newProcesses;
+        private ConcurrentDictionary<int, Process> prevProcesses;
+        private ConcurrentDictionary<int, bool> isActive;
         private string labelCountProcText;
         private string labelCommonMemoryText;
         private double coefMb;
@@ -42,6 +45,14 @@ namespace ProcessList
             labelCountProcText = "Всего процессов: ";
             labelCommonMemoryText = "Общая память: ";
             gridProcessList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            newProcesses = Process.GetProcesses();
+            prevProcesses = new ConcurrentDictionary<int, Process>();
+            isActive = new ConcurrentDictionary<int, bool>();
+            foreach (Process process in newProcesses)
+            {
+                prevProcesses.TryAdd(process.Id, process);
+                isActive.TryAdd(process.Id, false);
+            }
             work();
             mre = new ManualResetEvent(true);
             updateThread = new Thread(UpdateProcess);
@@ -57,14 +68,16 @@ namespace ProcessList
         }
         private void work()
         {
-            localAll = Process.GetProcesses();
+            newProcesses = Process.GetProcesses();
+            ConcurrentDictionary<int, Process> currentProcess = new ConcurrentDictionary<int, Process>();
+            ConcurrentDictionary<int, bool> currentActive = new ConcurrentDictionary<int, bool>();
             int time;
             string timeString;
             double memory;
             double totalMemory = 0;
-            DataGridViewRow[] rows = new DataGridViewRow[localAll.Length];
+            DataGridViewRow[] rows = new DataGridViewRow[newProcesses.Length];
             int i = 0;
-            foreach (Process process in localAll)
+            foreach (Process process in newProcesses)
             {
                 memory = Math.Round(process.WorkingSet64 / coefMb, 2);
                 try
@@ -80,12 +93,16 @@ namespace ProcessList
                 rows[i].CreateCells(gridProcessList, process.Id.ToString(), process.ProcessName, memory.ToString(), timeString, process.Threads.Count.ToString());
                 totalMemory += memory;
                 i++;
+                if (isActive.ContainsKey(process.Id)) isActive[process.Id] = true;
+                else logger.Info($"Появился новый процесс, ID: {process.Id}, Name: {process.ProcessName}");
+                currentProcess.TryAdd(process.Id, process);
+                currentActive.TryAdd(process.Id, false);
             }
             if (InvokeRequired)
             {
                 Action actionClear = () => gridProcessList.Rows.Clear();
                 Action actionAdd = () => gridProcessList.Rows.AddRange(rows);
-                Action actionUpdateLabelCount = () => labelCountProc.Text = labelCountProcText + localAll.Length.ToString();
+                Action actionUpdateLabelCount = () => labelCountProc.Text = labelCountProcText + newProcesses.Length.ToString();
                 Action actionUpdateLabelMemory = () => labelCommonMemory.Text = labelCommonMemoryText + Math.Round(totalMemory, 2).ToString() + " Мб";
                 BeginInvoke(actionClear);
                 BeginInvoke(actionAdd);
@@ -98,9 +115,20 @@ namespace ProcessList
             {
                 gridProcessList.Rows.Clear();
                 gridProcessList.Rows.AddRange(rows);
-                labelCountProc.Text = labelCountProcText + localAll.Length.ToString();
+                labelCountProc.Text = labelCountProcText + newProcesses.Length.ToString();
                 labelCommonMemory.Text = labelCommonMemoryText + Math.Round(totalMemory, 2).ToString() + " Мб";
             }
+            foreach(var prevProcess in prevProcesses)
+            {
+                if (!isActive[prevProcess.Key])
+                {
+                    logger.Info($"Процесс ID: {prevProcess.Key} Name: {prevProcess.Value.ProcessName}, завершил работу");
+                }
+            }
+            prevProcesses.Clear();
+            isActive.Clear();
+            prevProcesses = currentProcess;
+            isActive = currentActive;
         }
         private void gridProcess_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -113,7 +141,7 @@ namespace ProcessList
             logger.Info("Открытие формы ProcessInfoForm по двойному клику");
             try
             {
-                ProccessInfoForm processInfoForm = new ProccessInfoForm(localAll[e.RowIndex]);
+                ProccessInfoForm processInfoForm = new ProccessInfoForm(newProcesses[e.RowIndex]);
                 processInfoForm.ShowDialog();
             }
             catch (Exception ex)
@@ -130,7 +158,7 @@ namespace ProcessList
                 logger.Info("Открытие формы ProcessInfoForm по нажатию Enter при выделенной строке");
                 try
                 {
-                    ProccessInfoForm processInfoForm = new ProccessInfoForm(localAll[gridProcessList.CurrentRow.Index]);
+                    ProccessInfoForm processInfoForm = new ProccessInfoForm(newProcesses[gridProcessList.CurrentRow.Index]);
                     processInfoForm.ShowDialog();
                 }
                 catch (Exception ex)

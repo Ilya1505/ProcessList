@@ -10,6 +10,8 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using NLog;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ProcessList
 {
@@ -33,6 +35,7 @@ namespace ProcessList
             gridProcess.AutoResizeRows();
             gridProcess.AllowUserToAddRows = false;
             int time;
+            gridProcess.Rows.Clear();
             gridProcess.Rows.Add("ID", process.Id.ToString());
             gridProcess.Rows.Add("Имя", process.ProcessName);
             gridProcess.Rows.Add("Физическая память", Math.Round(process.WorkingSet64 / coefMb, 2).ToString() + "Мб");
@@ -40,33 +43,31 @@ namespace ProcessList
             gridProcess.Rows.Add("Максимальная память", Math.Round(process.PeakWorkingSet64 / coefMb, 2).ToString() + "Мб");
             try { gridProcess.Rows.Add("Время старта", process.StartTime.ToString()); }
             catch { gridProcess.Rows.Add("Время старта", "Отказано в доступе"); }
-            try { gridProcess.Rows.Add("Время завершения", process.ExitTime.ToString()); }
-            catch { gridProcess.Rows.Add("Время завершения", "Отказано в доступе"); }
-            try {
+            try
+            {
                 time = process.TotalProcessorTime.Seconds + process.UserProcessorTime.Seconds;
                 gridProcess.Rows.Add("Время работы", (time / 60).ToString() + "мин " + (time % 60).ToString() + "сек");
             }
             catch { gridProcess.Rows.Add("Время работы", "Отказано в доступе"); }
             gridProcess.Rows.Add("Число потоков", process.Threads.Count.ToString());
         }
-
         private void killButton_Click(object sender, EventArgs e)
         {
             try
             {
                 process.Kill();
                 MessageBox.Show("Процесс успешно завершен", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                logger.Info("Процесс {0}: {1} успешно завершен", process.Id, process.ProcessName);
+                logger.Info($"Процесс {process.Id}: {process.ProcessName} успешно завершен");
                 this.Close();
             }
             catch 
             {
-                logger.Error("Не удалось завершить процесс {0}: {1}, отказано в доступе ", process.Id, process.ProcessName);
+                logger.Error($"Не удалось завершить процесс {process.Id}: {process.ProcessName}, отказано в доступе ");
                 MessageBox.Show("Не удалось выполнить операцию", "Отказано в доступе", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ExitButton_Click(object sender, EventArgs e)
         {
             logger.Info("Закрытие формы ProcessInfoForm");
             this.Close();
