@@ -15,25 +15,30 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ProcessList
 {
+    // класс формы подробных сведений о процессе
     public partial class ProccessInfoForm : Form
     {
-        private static Logger logger;
-        private Process process;
-        private double coefMb;
+        private static Logger logger;// переменная для логгирования
+        private Process process;// выбранный пользователем процесс
+        private const double coefMb = 1048576;// коэффициент для перевода байт в МБайт
         public ProccessInfoForm(Process process)
         {
-            logger = LogManager.GetCurrentClassLogger();
             InitializeComponent();
             Setup(process);
-
         }
+        // инициализация формы
         public void Setup(Process process)
         {
+            logger = LogManager.GetCurrentClassLogger();
             logger.Info("Инициализация формы ProcessInfoForm");
-            this.process = process;
-            coefMb = 1048576;
+            this.process = process;// сохранение выбранного пользователем процесса
             gridProcess.AutoResizeRows();
             gridProcess.AllowUserToAddRows = false;
+            printInformation();
+        }
+        // вывод сведений о процессе на форму
+        public void printInformation()
+        {
             int time;
             gridProcess.Rows.Clear();
             gridProcess.Rows.Add("ID", process.Id.ToString());
@@ -51,6 +56,7 @@ namespace ProcessList
             catch { gridProcess.Rows.Add("Время работы", "Отказано в доступе"); }
             gridProcess.Rows.Add("Число потоков", process.Threads.Count.ToString());
         }
+        // попытка завершения процесса по нажатию на кнопку
         private void killButton_Click(object sender, EventArgs e)
         {
             try
@@ -66,7 +72,7 @@ namespace ProcessList
                 MessageBox.Show("Не удалось выполнить операцию", "Отказано в доступе", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
+        // закрытие формы по нажатию на кнопку
         private void ExitButton_Click(object sender, EventArgs e)
         {
             logger.Info("Закрытие формы ProcessInfoForm");
