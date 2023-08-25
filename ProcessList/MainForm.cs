@@ -12,6 +12,7 @@ using System.Collections.Concurrent;
 using NLog;
 using NLog.Fluent;
 using NLog.LayoutRenderers;
+using System.IO;
 
 namespace ProcessList
 {
@@ -27,7 +28,8 @@ namespace ProcessList
         private string labelCommonMemoryText;
         private const double coefMb = 1048576;// коэффициент для перевода байт в МБайт
         private Thread updateThread;// вторичный поток обновления списка процессов
-        private static ManualResetEvent mre;//
+        private static ManualResetEvent mre;
+        private string pathREADME = "README.md";// название файла с информацией о программе
         public MainForm()
         {
             InitializeComponent();
@@ -151,16 +153,13 @@ namespace ProcessList
             prevProcesses = currentProcess;
             isActive = currentActive;
         }
-        // обработка события выделения строки таблицы пользователем
-        private void gridProcess_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            logger.Info("Выделение строки пользователем");
-            gridProcessList.Rows[e.RowIndex].Selected = true;
-        }
-
         // открытие формы подбробных сведений о процессе по двойному клику мыши по строке таблицы
         private void gridProcessList_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            if (e.RowIndex < 0 || e.RowIndex > newProcesses.Length)
+            {
+                return;
+            }
             logger.Info("Открытие формы ProcessInfoForm по двойному клику");
             try
             {
@@ -214,6 +213,22 @@ namespace ProcessList
         private void exitButton_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        // вывод информации о программе в MessageBox
+        private void aboutProgrammButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                StreamReader streamReader = new StreamReader(pathREADME);
+                string aboutProgrammText = streamReader.ReadToEnd();
+                MessageBox.Show(aboutProgrammText, "О программе", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                streamReader.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

@@ -32,23 +32,26 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.gridProcessList = new System.Windows.Forms.DataGridView();
-            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.memory = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.time = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.threads = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.labelCountProc = new System.Windows.Forms.Label();
             this.labelCommonMemory = new System.Windows.Forms.Label();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.startButton = new System.Windows.Forms.ToolStripButton();
             this.aboutProgrammButton = new System.Windows.Forms.ToolStripButton();
             this.exitButton = new System.Windows.Forms.ToolStripButton();
+            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.memory = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.time = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.threads = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.gridProcessList)).BeginInit();
             this.toolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // gridProcessList
             // 
+            this.gridProcessList.AllowUserToAddRows = false;
+            this.gridProcessList.AllowUserToDeleteRows = false;
+            this.gridProcessList.AllowUserToResizeRows = false;
             this.gridProcessList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -78,50 +81,16 @@
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.gridProcessList.DefaultCellStyle = dataGridViewCellStyle2;
             this.gridProcessList.Location = new System.Drawing.Point(0, 35);
+            this.gridProcessList.MultiSelect = false;
             this.gridProcessList.Name = "gridProcessList";
+            this.gridProcessList.ReadOnly = true;
             this.gridProcessList.RowHeadersVisible = false;
             this.gridProcessList.RowHeadersWidth = 51;
             this.gridProcessList.RowTemplate.Height = 24;
             this.gridProcessList.Size = new System.Drawing.Size(1263, 600);
             this.gridProcessList.TabIndex = 0;
-            this.gridProcessList.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridProcess_CellContentClick);
             this.gridProcessList.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.gridProcessList_CellMouseDoubleClick);
             this.gridProcessList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gridProcessList_KeyDown);
-            // 
-            // id
-            // 
-            this.id.HeaderText = "ID";
-            this.id.MinimumWidth = 6;
-            this.id.Name = "id";
-            this.id.ReadOnly = true;
-            // 
-            // name
-            // 
-            this.name.HeaderText = "Имя";
-            this.name.MinimumWidth = 6;
-            this.name.Name = "name";
-            this.name.ReadOnly = true;
-            // 
-            // memory
-            // 
-            this.memory.HeaderText = "Память (Мб)";
-            this.memory.MinimumWidth = 6;
-            this.memory.Name = "memory";
-            this.memory.ReadOnly = true;
-            // 
-            // time
-            // 
-            this.time.HeaderText = "Время работы (мин:сек)";
-            this.time.MinimumWidth = 6;
-            this.time.Name = "time";
-            this.time.ReadOnly = true;
-            // 
-            // threads
-            // 
-            this.threads.HeaderText = "Число потоков";
-            this.threads.MinimumWidth = 6;
-            this.threads.Name = "threads";
-            this.threads.ReadOnly = true;
             // 
             // labelCountProc
             // 
@@ -177,6 +146,7 @@
             this.aboutProgrammButton.Name = "aboutProgrammButton";
             this.aboutProgrammButton.Size = new System.Drawing.Size(140, 32);
             this.aboutProgrammButton.Text = "О программе";
+            this.aboutProgrammButton.Click += new System.EventHandler(this.aboutProgrammButton_Click);
             // 
             // exitButton
             // 
@@ -188,6 +158,41 @@
             this.exitButton.Size = new System.Drawing.Size(73, 32);
             this.exitButton.Text = "Выход";
             this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
+            // 
+            // id
+            // 
+            this.id.HeaderText = "ID";
+            this.id.MinimumWidth = 6;
+            this.id.Name = "id";
+            this.id.ReadOnly = true;
+            // 
+            // name
+            // 
+            this.name.HeaderText = "Имя";
+            this.name.MinimumWidth = 6;
+            this.name.Name = "name";
+            this.name.ReadOnly = true;
+            // 
+            // memory
+            // 
+            this.memory.HeaderText = "Память (Мб)";
+            this.memory.MinimumWidth = 6;
+            this.memory.Name = "memory";
+            this.memory.ReadOnly = true;
+            // 
+            // time
+            // 
+            this.time.HeaderText = "Время работы (мин:сек)";
+            this.time.MinimumWidth = 6;
+            this.time.Name = "time";
+            this.time.ReadOnly = true;
+            // 
+            // threads
+            // 
+            this.threads.HeaderText = "Число потоков";
+            this.threads.MinimumWidth = 6;
+            this.threads.Name = "threads";
+            this.threads.ReadOnly = true;
             // 
             // MainForm
             // 
@@ -215,15 +220,15 @@
         private System.Windows.Forms.DataGridView gridProcessList;
         private System.Windows.Forms.Label labelCountProc;
         private System.Windows.Forms.Label labelCommonMemory;
+        private System.Windows.Forms.ToolStrip toolStrip;
+        private System.Windows.Forms.ToolStripButton startButton;
+        private System.Windows.Forms.ToolStripButton aboutProgrammButton;
+        private System.Windows.Forms.ToolStripButton exitButton;
         private System.Windows.Forms.DataGridViewTextBoxColumn id;
         private System.Windows.Forms.DataGridViewTextBoxColumn name;
         private System.Windows.Forms.DataGridViewTextBoxColumn memory;
         private System.Windows.Forms.DataGridViewTextBoxColumn time;
         private System.Windows.Forms.DataGridViewTextBoxColumn threads;
-        private System.Windows.Forms.ToolStrip toolStrip;
-        private System.Windows.Forms.ToolStripButton startButton;
-        private System.Windows.Forms.ToolStripButton aboutProgrammButton;
-        private System.Windows.Forms.ToolStripButton exitButton;
     }
 }
 
